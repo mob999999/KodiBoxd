@@ -1,76 +1,64 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
 )
 
-type Config struct {
-	LetterboxdUsername string `json:"letterBoxdUsername"`
-	KodiIP             string `json:"kodiIP"`
-	KodiPort           string `json:"kodiPort"`
-	KodiUsername       string `json:"kodiUsername,omitempty"` // omitempty to skip if empty
-	KodiPassword       string `json:"kodiPassword,omitempty"` // omitempty to skip if empty
-}
-
 func main() {
-	var config Config
-
-	// Check if config.json already exists
-	if _, err := os.Stat("config.json"); err == nil {
-		// File exists, read the existing configuration
-		file, err := os.Open("config.json")
-		if err != nil {
-			fmt.Println("Error opening config file:", err)
-			return
-		}
-		defer file.Close()
-
-		decoder := json.NewDecoder(file)
-		if err := decoder.Decode(&config); err != nil {
-			fmt.Println("Error reading config file:", err)
-			return
-		}
-
-		fmt.Println("Configuration already exists:")
-		fmt.Printf("Letterboxd Username: %s\n", config.LetterboxdUsername)
+	// Load configuration if available
+	config, err := LoadConfig() // Call LoadConfig from config.go
+	if err == nil {
+		fmt.Println("Configuration loaded from config.json:")
+		fmt.Printf("Letterboxd Username: %s\n", config.LetterBoxdUsername) // Fixed case
 		fmt.Printf("Kodi IP Address: %s\n", config.KodiIP)
 		fmt.Printf("Kodi Port: %s\n", config.KodiPort)
 		fmt.Printf("Kodi Username: %s\n", config.KodiUsername)
-		fmt.Println("Kodi Password: [hidden]") // Do not print the password for security reasons
+		fmt.Println("Kodi Password: [hidden]") // Security measure
+
+		// Fetch and display Letterboxd watchlist
+		movies := getLetterboxdWatchlist(config.LetterBoxdUsername) // Fixed case
+		fmt.Println("\nYour Letterboxd Watchlist:")
+		for _, movie := range movies {
+			fmt.Println("-", movie)
+		}
+
+		// Fetch and display Kodi movies
+		kodiMovies, err := getKodiMovies() // Pass config to function
+		if err != nil {
+			fmt.Println("Error fetching Kodi movies:", err)
+			return
+		}
+
+		fmt.Println("\nYour Kodi Library Movies:")
+		for _, movie := range kodiMovies {
+			fmt.Printf("- %s (%d)\n", movie.Title, movie.Year)
+		}
+
 		return
 	}
 
-	// If the config file does not exist, prompt for input
+	// If config is missing or corrupted, prompt the user to enter details
+	var newConfig Config
+	fmt.Println("No valid config file found. Please enter your details.")
+
 	fmt.Print("Letterboxd Username: ")
-	fmt.Scanln(&config.LetterboxdUsername)
+	fmt.Scanln(&newConfig.LetterBoxdUsername) // Fixed case
 
 	fmt.Print("Kodi IP Address: ")
-	fmt.Scanln(&config.KodiIP)
+	fmt.Scanln(&newConfig.KodiIP)
 
 	fmt.Print("Kodi Port: ")
-	fmt.Scanln(&config.KodiPort)
+	fmt.Scanln(&newConfig.KodiPort)
 
 	fmt.Print("Kodi Username (leave blank if not applicable): ")
-	fmt.Scanln(&config.KodiUsername)
+	fmt.Scanln(&newConfig.KodiUsername)
 
 	fmt.Print("Kodi Password: ")
-	fmt.Scanln(&config.KodiPassword)
+	fmt.Scanln(&newConfig.KodiPassword)
 
-	// Create or open the config.json file
-	file, err := os.Create("config.json")
-	if err != nil {
-		fmt.Println("Error creating config file:", err)
-		return
-	}
-	defer file.Close()
-
-	// Encode the config struct to JSON and write to file
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ") // Pretty print
-	if err := encoder.Encode(config); err != nil {
-		fmt.Println("Error writing to config file:", err)
+	// Save the newly entered configuration
+	if err := SaveConfig(newConfig); err != nil { // Call SaveConfig from config.go
+		fmt.Println("Error saving configuration:", err)
 		return
 	}
 

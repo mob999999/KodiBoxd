@@ -9,14 +9,6 @@ import (
 	"net/http"
 )
 
-// Kodi API Credentials
-const (
-	kodiHost     = "192.168.178.42" // Replace with your Kodi instance's IP address
-	kodiPort     = "8080"           // Default Kodi JSON-RPC port
-	kodiUsername = "kodi"
-	kodiPassword = "kodimb"
-)
-
 // kodiRequest defines the structure for Kodi API requests.
 type kodiRequest struct {
 	JsonRPC string                 `json:"jsonrpc"`
@@ -47,6 +39,12 @@ type KodiMovie struct {
 
 // getKodiMovies fetches movies from the Kodi library.
 func getKodiMovies() ([]KodiMovie, error) {
+	// Load configuration
+	config, err := LoadConfig()
+	if err != nil {
+		return nil, fmt.Errorf("error loading config: %w", err)
+	}
+
 	// Create request for movies.
 	reqBody := kodiRequest{
 		JsonRPC: "2.0",
@@ -60,15 +58,19 @@ func getKodiMovies() ([]KodiMovie, error) {
 		return nil, fmt.Errorf("error marshaling request: %w", err)
 	}
 
-	kodiURL := fmt.Sprintf("http://%s:%s/jsonrpc", kodiHost, kodiPort)
+	kodiURL := fmt.Sprintf("http://%s:%s/jsonrpc", config.KodiIP, config.KodiPort)
 	req, err := http.NewRequest("POST", kodiURL, bytes.NewBuffer(jsonData))
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	auth := base64.StdEncoding.EncodeToString([]byte(kodiUsername + ":" + kodiPassword))
-	req.Header.Set("Authorization", "Basic "+auth)
+
+	// Add authentication only if credentials are provided
+	if config.KodiUsername != "" && config.KodiPassword != "" {
+		auth := base64.StdEncoding.EncodeToString([]byte(config.KodiUsername + ":" + config.KodiPassword))
+		req.Header.Set("Authorization", "Basic "+auth)
+	}
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

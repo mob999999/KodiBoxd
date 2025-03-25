@@ -62,5 +62,10 @@ func main() {
 		return
 	}
 
-	fmt.Println("Configuration saved to config.json")
+	fmt.Println("Configuration saved to config.json. Please exit and rerun KodiBoxd.exe for changes to take effect.")
+
+	// Keep terminal open
+	fmt.Print("Press Enter to exit...")
+	var dummy string
+	fmt.Scanln(&dummy) // Wait for user input
 }

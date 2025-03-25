@@ -32,7 +32,7 @@ func getLetterboxdWatchlist(letterboxdUsername string) []string {
 		wg.Add(1)
 	})
 
-	// Extract movie titles.
+	// Extract movie titles. TRY TO FIND OUT Movie Year for proper Comparison!!!
 	c.OnHTML(".poster-container img", func(e *colly.HTMLElement) {
 		title := e.Attr("alt")
 		fmt.Println("Found title:", title)

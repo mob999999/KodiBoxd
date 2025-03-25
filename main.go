@@ -1,75 +1,78 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 )
 
+type Config struct {
+	LetterboxdUsername string `json:"letterBoxdUsername"`
+	KodiIP             string `json:"kodiIP"`
+	KodiPort           string `json:"kodiPort"`
+	KodiUsername       string `json:"kodiUsername,omitempty"` // omitempty to skip if empty
+	KodiPassword       string `json:"kodiPassword,omitempty"` // omitempty to skip if empty
+}
+
 func main() {
-	fmt.Println("Starting Letterboxd Watchlist vs Kodi comparison...")
+	var config Config
 
-	// Get username from command line or use default from letterboxd.go
-	username := letterboxdUsername
-	if len(os.Args) > 1 {
-		username = os.Args[1]
-	}
+	// Check if config.json already exists
+	if _, err := os.Stat("config.json"); err == nil {
+		// File exists, read the existing configuration
+		file, err := os.Open("config.json")
+		if err != nil {
+			fmt.Println("Error opening config file:", err)
+			return
+		}
+		defer file.Close()
 
-	// Load Letterboxd watchlist
-	fmt.Printf("Fetching watchlist for user %s from Letterboxd...\n", username)
-	letterboxdMovies := getLetterboxdWatchlist(username)
-	fmt.Printf("Found %d movies in Letterboxd watchlist\n", len(letterboxdMovies))
+		decoder := json.NewDecoder(file)
+		if err := decoder.Decode(&config); err != nil {
+			fmt.Println("Error reading config file:", err)
+			return
+		}
 
-	// Load Kodi library
-	fmt.Println("Fetching movies from Kodi library...")
-	kodiMovies, err := getKodiMovies()
-	if err != nil {
-		fmt.Println("Error fetching Kodi library:", err)
+		fmt.Println("Configuration already exists:")
+		fmt.Printf("Letterboxd Username: %s\n", config.LetterboxdUsername)
+		fmt.Printf("Kodi IP Address: %s\n", config.KodiIP)
+		fmt.Printf("Kodi Port: %s\n", config.KodiPort)
+		fmt.Printf("Kodi Username: %s\n", config.KodiUsername)
+		fmt.Println("Kodi Password: [hidden]") // Do not print the password for security reasons
 		return
 	}
-	fmt.Printf("Found %d movies in Kodi library\n", len(kodiMovies))
 
-	// Create normalized map of Kodi movies for faster lookup
-	kodiMovieMap := make(map[string]KodiMovie)
-	for _, movie := range kodiMovies {
-		normalizedTitle := normalizeTitle(movie.Title)
-		kodiMovieMap[normalizedTitle] = movie
-	}
+	// If the config file does not exist, prompt for input
+	fmt.Print("Letterboxd Username: ")
+	fmt.Scanln(&config.LetterboxdUsername)
 
-	// Compare the watchlist with Kodi library
-	var inBoth, onlyInWatchlist []string
+	fmt.Print("Kodi IP Address: ")
+	fmt.Scanln(&config.KodiIP)
 
-	for _, lbMovieTitle := range letterboxdMovies {
-		normalizedTitle := normalizeTitle(lbMovieTitle)
-		if _, exists := kodiMovieMap[normalizedTitle]; exists {
-			inBoth = append(inBoth, lbMovieTitle)
-		} else {
-			onlyInWatchlist = append(onlyInWatchlist, lbMovieTitle)
-		}
-	}
+	fmt.Print("Kodi Port: ")
+	fmt.Scanln(&config.KodiPort)
 
-	// Print results
-	fmt.Println("\n=== COMPARISON RESULTS ===")
+	fmt.Print("Kodi Username (leave blank if not applicable): ")
+	fmt.Scanln(&config.KodiUsername)
 
-	fmt.Printf("\nMovies in both watchlist and Kodi library (%d):\n", len(inBoth))
-	for i, movie := range inBoth {
-		fmt.Printf("  %d. %s\n", i+1, movie)
-	}
+	fmt.Print("Kodi Password: ")
+	fmt.Scanln(&config.KodiPassword)
 
-	fmt.Printf("\nMovies in watchlist but not in Kodi library (%d):\n", len(onlyInWatchlist))
-	for i, movie := range onlyInWatchlist {
-		fmt.Printf("  %d. %s\n", i+1, movie)
-	}
-
-	// Save movies not in Kodi to a file
-	outputFile := "movies_to_add.txt"
-	file, err := os.Create(outputFile)
+	// Create or open the config.json file
+	file, err := os.Create("config.json")
 	if err != nil {
-		fmt.Println("Error creating output file:", err)
-	} else {
-		defer file.Close()
-		for _, movie := range onlyInWatchlist {
-			file.WriteString(movie + "\n")
-		}
-		fmt.Printf("\nList of movies to add has been saved to %s\n", outputFile)
+		fmt.Println("Error creating config file:", err)
+		return
 	}
+	defer file.Close()
+
+	// Encode the config struct to JSON and write to file
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ") // Pretty print
+	if err := encoder.Encode(config); err != nil {
+		fmt.Println("Error writing to config file:", err)
+		return
+	}
+
+	fmt.Println("Configuration saved to config.json")
 }

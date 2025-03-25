@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<addon id="script.qr_code_ip" name="QR Code IP" version="1.0" provider-name="mob999999">
-    <extension point="xbmc.python.script" library="default.py"/>
-    <requires>
-        <import addon="xbmc.python" version="3.0.0"/>
-    </requires>
-    <description>Generates a QR code containing the local IP address of the Kodi device.</description>
-    <platform>all</platform>
-</addon>

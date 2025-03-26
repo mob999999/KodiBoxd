@@ -96,3 +96,8 @@ Comparison Results:
 
 ## License
 This project is licensed under the [MIT License](LICENSE) - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## Disclaimer
+This project is not affiliated with Letterboxd or Kodi. Use responsibly and comply with their terms.

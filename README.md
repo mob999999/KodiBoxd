@@ -98,4 +98,3 @@ Comparison Results:
 ## License
 
 MIT
-```

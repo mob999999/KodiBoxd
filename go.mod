@@ -1,4 +1,4 @@
-module kodiBoxd
+module github.com/mob999999/KodiBoxd
 
 go 1.24.0
 

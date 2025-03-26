@@ -40,7 +40,10 @@ A Go-based tool to compare your Letterboxd watchlist with your Kodi movie librar
 
 Run the compiled executable:
    ```bash
-   go run kodiBoxd
+   Windows: 
+   kodiBoxd.exe
+   linux:
+   kodiBoxd
    ```
 ---
 

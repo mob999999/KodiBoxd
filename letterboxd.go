@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"sync"
 	"time"
 
@@ -9,6 +11,11 @@ import (
 )
 
 // getLetterboxdWatchlist scrapes the Letterboxd watchlist for a given username.
+// structing release year from supplemental Letterboxd JSON
+type FilmData struct {
+	ReleaseYear int `json:"releaseYear"`
+}
+
 func getLetterboxdWatchlist(letterboxdUsername string) []string {
 	c := colly.NewCollector()
 	var wg sync.WaitGroup
@@ -32,11 +39,46 @@ func getLetterboxdWatchlist(letterboxdUsername string) []string {
 		wg.Add(1)
 	})
 
-	// Extract movie titles. TRY TO FIND OUT Movie Year for proper Comparison!!!
-	c.OnHTML(".poster-container img", func(e *colly.HTMLElement) {
-		title := e.Attr("alt")
-		fmt.Println("Found title:", title)
-		movies = append(movies, title)
+	c.OnHTML(".poster-container div[data-production-data-endpoint]", func(e *colly.HTMLElement) {
+		// Extract the title from the nested <img> tag
+		title := e.ChildAttr("img", "alt")
+		if title == "" {
+			fmt.Println("No title found")
+			return
+		}
+
+		// Extract the JSON endpoint
+		endpoint := e.Attr("data-production-data-endpoint")
+		if endpoint == "" {
+			fmt.Println("No JSON endpoint found")
+			return
+		}
+		jsonURL := "https://letterboxd.com" + endpoint
+
+		// Fetch JSON data
+		resp, err := http.Get(jsonURL)
+		if err != nil {
+			fmt.Printf("Error fetching JSON: %v\n", err)
+			return
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != 200 {
+			fmt.Printf("HTTP error: %d\n", resp.StatusCode)
+			return
+		}
+
+		// Parse the JSON
+		var filmData FilmData
+		if err := json.NewDecoder(resp.Body).Decode(&filmData); err != nil {
+			fmt.Printf("JSON decode error: %v\n", err)
+			return
+		}
+
+		// Combine title and year
+		movieWithYear := fmt.Sprintf("%s (%d)", title, filmData.ReleaseYear)
+		movies = append(movies, movieWithYear)
+		fmt.Println("Added:", movieWithYear)
 	})
 
 	// Log if no titles are found.

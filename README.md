@@ -22,7 +22,7 @@ A Go-based tool to compare your Letterboxd watchlist with your Kodi movie librar
 ### Steps
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/kodiboxd.git
+   git clone https://github.com/mob999999/kodiboxd.git
    cd kodiboxd
    ```
 
@@ -33,9 +33,12 @@ A Go-based tool to compare your Letterboxd watchlist with your Kodi movie librar
 
 3. Build the executable:
    ```bash
-   go build -o KodiBoxd
+   go build KodiBoxd
    ```
-
+4. Run the executable: 
+   ```bash
+   go run KodiBoxd
+   ```
 ---
 
 ## Configuration

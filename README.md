@@ -35,7 +35,10 @@ A Go-based tool to compare your Letterboxd watchlist with your Kodi movie librar
    ```bash
    go build KodiBoxd
    ```
-4. Run the executable: 
+
+## Usage
+
+Run the compiled executable:
    ```bash
    go run KodiBoxd
    ```
@@ -59,17 +62,6 @@ Create a `config.json` file in the project root with the following structure:
 ```
 
 ---
-
-## Usage
-
-Run the compiled executable:
-```bash
-# Linux/macOS
-./KodiBoxd
-
-# Windows
-KodiBoxd.exe
-```
 
 ### Example Output
 ```

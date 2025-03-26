@@ -46,15 +46,19 @@ Run the compiled executable:
    linux:
    kodiBoxd
    ```
+Be sure that your Kodi instance is currently running and that you have enabled "Allow remote control via HTTP" (Settings/Services/Control). Here you can also set a username and password for your Kodi instance
+
 ---
+
 
 ## Configuration
 
 ### Auto-Setup
 If no `config.json` exists, the program will prompt you to enter details on first run.
+To get your Kodis local IP adress, check the network settings of the device.
 
 ### Manual Setup
-Create a `config.json` file in the project root with the following structure:
+Create a `config.json` file in the project root with the following structure (these are sample values):
 ```json
 {
   "LetterBoxdUsername": "your_letterboxd_username",

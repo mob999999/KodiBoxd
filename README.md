@@ -34,7 +34,7 @@ A Go-based tool to compare your Letterboxd watchlist with your Kodi movie librar
 
 3. Build the executable:
    ```bash
-   go build kodiBoxd
+   go build
    ```
 
 ## Usage
@@ -42,9 +42,9 @@ A Go-based tool to compare your Letterboxd watchlist with your Kodi movie librar
 Run the compiled executable:
    ```bash
    Windows: 
-   kodiBoxd.exe
+   KodiBoxd.exe
    linux:
-   kodiBoxd
+   ./KodiBoxd
    ```
 Be sure that your Kodi instance is currently running and that you have enabled "Allow remote control via HTTP" (Settings/Services/Control). Here you can also set a username and password for your Kodi instance
 

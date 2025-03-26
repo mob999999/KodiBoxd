@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 )
 
 func main() {
@@ -25,7 +26,7 @@ func main() {
 		// Fetch and display Kodi movies
 		kodiMovies, err := getKodiMovies() // Pass config to function
 		if err != nil {
-			fmt.Println("Error fetching Kodi movies:", err)
+			fmt.Println("Check Config. Error fetching Kodi movies:", err)
 			return
 		}
 
@@ -33,7 +34,37 @@ func main() {
 		for _, movie := range kodiMovies {
 			fmt.Printf("- %s (%d)\n", movie.Title, movie.Year)
 		}
+		// Convert []KodiMovie to []Movie
+		convertedKodiMovies := make([]Movie, len(kodiMovies))
+		for i, km := range kodiMovies {
+			convertedKodiMovies[i] = Movie{Title: km.Title, Year: km.Year}
+		}
+		// Convert Letterboxd entries to Movie structs
+		convertedMovies := make([]Movie, 0, len(movies))
+		for _, entry := range movies {
+			// Split into title and year using parenthesis
+			idx := strings.LastIndex(entry, " (")
+			if idx == -1 || !strings.HasSuffix(entry, ")") {
+				fmt.Printf("Failed to parse: %s\n", entry)
+				continue
+			}
 
+			title := strings.TrimSpace(entry[:idx])
+			yearStr := entry[idx+2 : len(entry)-1] // Extract "YYYY"
+
+			var year int
+			if _, err := fmt.Sscanf(yearStr, "%d", &year); err != nil {
+				fmt.Printf("Failed to parse year in: %s\n", entry)
+				continue
+			}
+
+			convertedMovies = append(convertedMovies, Movie{
+				Title: title,
+				Year:  year,
+			})
+		}
+		// Call the comparison function with the converted list
+		CompareMovies(convertedMovies, convertedKodiMovies)
 		return
 	}
 

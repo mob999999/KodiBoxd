@@ -33,6 +33,7 @@ func getLetterboxdWatchlist(letterboxdUsername string) []string {
 	var movies []string
 
 	// Log when visiting pages.
+	fmt.Println("Accessing your Watchlist, please hold tight.")
 	c.OnRequest(func(r *colly.Request) {
 		fmt.Println("Visiting:", r.URL.String())
 		// Increment the WaitGroup counter when a new request starts.

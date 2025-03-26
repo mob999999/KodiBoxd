@@ -1,3 +1,4 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 # KodiBoxd
 
 A Go-based tool to compare your Letterboxd watchlist with your Kodi movie library. Identify which movies you already own and which ones are missing!
@@ -94,5 +95,4 @@ Comparison Results:
 ---
 
 ## License
-
-MIT
+This project is licensed under the [MIT License](LICENSE) - see the [LICENSE](LICENSE) file for details.

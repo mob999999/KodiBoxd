@@ -78,7 +78,6 @@ func getLetterboxdWatchlist(letterboxdUsername string) []string {
 		// Combine title and year
 		movieWithYear := fmt.Sprintf("%s (%d)", title, filmData.ReleaseYear)
 		movies = append(movies, movieWithYear)
-		fmt.Println("Added:", movieWithYear)
 	})
 
 	// Log if no titles are found.
@@ -101,7 +100,7 @@ func getLetterboxdWatchlist(letterboxdUsername string) []string {
 	startURL := fmt.Sprintf("https://letterboxd.com/%s/watchlist/", letterboxdUsername)
 	err := c.Visit(startURL)
 	if err != nil {
-		fmt.Println("Error visiting start URL, check your config-file:", err)
+		fmt.Println("Error visiting start URL, check your username in config.json", err)
 	}
 
 	// Wait for all pages to be scraped.

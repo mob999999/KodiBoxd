@@ -33,14 +33,14 @@ A Go-based tool to compare your Letterboxd watchlist with your Kodi movie librar
 
 3. Build the executable:
    ```bash
-   go build KodiBoxd
+   go build kodiBoxd
    ```
 
 ## Usage
 
 Run the compiled executable:
    ```bash
-   go run KodiBoxd
+   go run kodiBoxd
    ```
 ---
 

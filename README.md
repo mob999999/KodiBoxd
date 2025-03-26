@@ -1,6 +1,3 @@
-Here's the properly formatted markdown version of your README:
-
-```markdown
 # KodiBoxd
 
 A Go-based tool to compare your Letterboxd watchlist with your Kodi movie library. Identify which movies you already own and which ones are missing!

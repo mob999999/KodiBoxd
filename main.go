@@ -26,7 +26,7 @@ func main() {
 		// Fetch and display Kodi movies
 		kodiMovies, err := getKodiMovies() // Pass config to function
 		if err != nil {
-			fmt.Println("Check Config. Error fetching Kodi movies:", err)
+			fmt.Println("Error fetching Kodi movies. Is your Kodi Device running and reachable? Is your config.json properly set up? ", err)
 			return
 		}
 
